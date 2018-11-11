@@ -10,9 +10,9 @@ const Div = styled.div`
 
 `;
 
-const ExpressionDisplay = ({ exp1, exp2 }) => (
+const ExpressionDisplay = ({ exp }) => (
     <Div >
-        {exp1}{exp2}
+        {exp}
     </Div>
 )
 
