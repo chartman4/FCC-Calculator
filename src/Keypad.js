@@ -3,12 +3,12 @@ import styled from "styled-components";
 import { calculate } from "./calculateUtil.js";
 
 const KeyPadContainer = styled.div`
-display: grid;
-background-color: #7f8084;
-grid-template-columns: 55% 35%;
-justify-content: space-around;
-padding: 10px;
-grid-gap: 20px;
+    display: grid;
+    background-color: #7f8084;
+    grid-template-columns: 55% 35%;
+    justify-content: space-around;
+    padding: 10px;
+    grid-gap: 20px;
 `
 
 const NumberKeysContainer = styled.div`
@@ -35,7 +35,6 @@ const Button = styled.button`
         box-shadow: 0px 2px 0 grey;
         color: white;
         }
-
 `
 
 const EQbutton = styled(Button)`
@@ -47,18 +46,15 @@ const Zerobutton = styled(Button)`
 `
 
 export default class Keypad extends Component {
-    static defaultProps = {
-        reset() { },
-        addToExpression() { },
-        updateCurrentOp() { }
-    }
+
     constructor(props) {
         super(props);
 
         this.state = {
-            allOps: [],
-            currentOp: "0",
-            resetDisplay: false
+            ops: [],
+            lastOp: "0",
+            resetDisplay: false,
+            expression: ""
         };
         this.onClearClick = this.onClearClick.bind(this);
         this.onNumberClick = this.onNumberClick.bind(this);
@@ -67,187 +63,178 @@ export default class Keypad extends Component {
         this.onCalculateClick = this.onCalculateClick.bind(this);
     }
 
+    // add an event listener to allow user to enter operations on keyboard
     componentDidMount() {
         document.addEventListener("keydown", this.handleKeydown);
     }
 
+    // remove the event listener to allow user to enter operations on keyboard
     componentWillUnmount() {
         document.removeEventListener("keydown", this.handleKeydown);
     }
 
-
+    // determine key pressed and call appropriate function
     handleKeydown = e => {
-        // if key pressed is char assigned to this drum pad, make sound
+        // get key pressed
         var c = e.key.toLowerCase();
-        console.log(c);
 
         if ("0123456789".indexOf(c) !== -1) this.processNumber(c);
         else if ("+-/*".indexOf(c) !== -1) this.processOperator(c);
         else if ("c" === c) this.processClear();
         else if ("=" === c) this.processCalc();
         else if ("." === c) this.processDecimal();
-
-
     };
 
+    // reset state and call functions passed by parent to update displays 
     processClear() {
         this.setState({
-            allOps: [],
-            currentOp: "0",
-            resetDisplay: false
+            ops: [],
+            resetDisplay: false,
+            lastOp: "0",
+            expression: ""
         })
-        this.props.reset();
+        this.props.updateCurrentOp("0");
+        this.props.updateExpression("");
     }
+
+    // when user clicks clear button
     onClearClick(e) {
-        console.log("reset");
         this.processClear();
     }
 
+
+    // process a number input
     processNumber(num) {
+        var op, exp = "";
+        var ops;
+        if (this.state.ops.length > 0) ops = this.state.ops.slice(); else ops = [];
         // number cases:
-        //      last op is 0, replace zero with number
+        //      last op is 0 and only op or last operation was to calculate, replace zero with number
         //      last op is operator, add operator to saved ops, save number as current operand
-        //          & clear operation flag
         //      otherwise append number to previous number
-        console.log(this.state.allOps.length);
-        if ((this.state.currentOp === "0" && this.state.allOps.length === 0) || this.state.resetDisplay) {
+        if ((this.state.lastOp === "0" && this.state.ops.length === 0) || this.state.resetDisplay) {
             // last op is 0, replace zero lastOp with number
-            this.setState({
-                allOps: [], currentOp: num
-            });
-            //update displayed Current Op
-            this.props.updateCurrentOp(num);
-            this.props.updateExpression("");
-
-
-        } else if ("+-*/".indexOf(this.state.currentOp) !== -1) {
+            op = num;
+            exp = "";
+            ops = [];
+        }
+        // currentOp is operator, add operator to saved ops, save number as currentOp
+        else if ("+-*/".indexOf(this.state.lastOp) !== -1) {
             // last op is operator, update displays and add operator to saved ops, save number as current operand
-            if (this.state.resetDisplay) this.props.updateExpression(this.state.currentOp);
-            else this.props.addToExpression(this.state.currentOp);
-            this.props.updateCurrentOp(num);
-            this.setState({
-                allOps: [...this.state.allOps, this.state.currentOp],
-                currentOp: num,
-                resetDisplay: false
-            })
+            op = num;
+            exp = this.state.expression + this.state.lastOp;  // append operator to expression
+            ops.push(this.state.lastOp);
         }
+        // otherwise append number to previous number
         else {
-            // otherwise append number to previous number
-            const newOp = this.state.currentOp.concat(num);
-            this.props.updateCurrentOp(newOp);
-
-            this.setState({
-                ...this.state, currentOp: newOp
-            });
+            op = this.state.lastOp.concat(num);
+            exp = this.state.expression; // does not change, ops state does not change
         }
+        this.setState({
+            ops: [...ops], lastOp: op, expression: exp, resetDisplay: false
+        });
+        this.props.updateCurrentOp(op);
+        const displayExp = exp.concat(op);
+        this.props.updateExpression(displayExp);
     }
+
     onNumberClick(e) {
-        console.log("onNumberClick");
-        // this.props.updateCurrentOp("7");
         const keyPressed = e.target.value;
-        console.log(keyPressed);
         this.processNumber(keyPressed);
-
     }
+
     processOperator(op) {
+        var exp = this.state.expression;
+        var ops = this.state.ops.slice();
         // operator cases:
-        //      previous op is operator, replace operator, 
-        //      previous op is a decimal or number, save last op to allOps, 
-        //             save operator 
-        if ("+-*/".indexOf(this.state.currentOp) !== -1) {
-            // previous op is operator, replace operator, 
-            // update displayed Current Op
-            this.setState({ ...this.state, currentOp: op })
-            this.props.updateCurrentOp(op);
-        } else {
-            //  previous op is a decimal or number, save current op to allOps, 
-            //             save operator as currentOp
-            if (this.state.resetDisplay) this.props.updateExpression(this.state.currentOp);
-
-            else this.props.addToExpression(this.state.currentOp);
-            const newOps = [...this.state.allOps, this.state.currentOp];
-            console.log(newOps);
-            this.setState({
-                allOps: newOps,
-                currentOp: op,
-                resetDisplay: false
-            });
-            this.props.updateCurrentOp(op);
+        //      previous op is an operator, replace currentOp with new op, no other changes
+        //      previous op is a decimal or number (not an operator), save it to ops state and
+        //      current operator to expression
+        if ("+-*/".indexOf(this.state.lastOp) === -1) {
+            //  previous op is a decimal or number, save current op to allOps, and currentOp to exp
+            ops.push(this.state.lastOp);
+            exp = exp.concat(this.state.lastOp);
         }
+
+        this.setState({
+            ops: [...ops], lastOp: op, expression: exp, resetDisplay: false
+        });
+        this.props.updateCurrentOp(op);
+        const display = exp.concat(op)
+        this.props.updateExpression(display);
     }
+
     onOperatorClick(e) {
         const keyPressed = e.target.value;
         this.processOperator(keyPressed);
     }
     processDecimal() {
+        var exp = this.state.expression;
+        var ops = this.state.ops.slice();
+        var op;
         // decimal point cases:
         //        after an operator, 
         //        after a number with no decimal, 
-        //        after a number that has a decimal already , 
-        // decimal after operator, save operator, save "0." as lastOp
-        if ("+-*/".indexOf(this.state.currentOp) !== -1) {
-            this.props.addToExpression(this.state.currentOp);
+        //        after a number that has a decimal already ,
 
-            this.setState({
-                allOps: [...this.state.allOps, this.state.currentOp],
-                currentOp: "0.",
-                resetDisplay: false
-
-            });
-
-            this.props.updateCurrentOp("0.");
-
+        // decimal after operator, save current operator, save "0." as currentOp
+        if ("+-*/".indexOf(this.state.lastOp) !== -1) {
+            ops.push(this.state.lastOp);
+            exp.concat(this.state.lastOp);
+            op = "0.";
         }
-        /// a number with no decimal, append decimal to lastOp and set flag
-        else if (this.state.currentOp.indexOf(".") === -1) {
-            const num = this.state.currentOp.concat(".");
-            console.log(num);
-            this.setState({
-                ...this.state,
-                currentOp: num,
-                resetDisplay: false
-
-            });
-            this.props.updateCurrentOp(num);
-
+        /// a number with no decimal, append decimal to currentOp
+        else if (this.state.lastOp.indexOf(".") === -1) {
+            op = this.state.lastOp.concat(".");
         }
         //  after a number that has a decimal already ignore keypressed
+        else op = this.state.lastOp;
+
+        this.setState({
+            ops: [...ops], lastOp: op, expression: exp, resetDisplay: false
+        });
+        this.props.updateCurrentOp(op);
+        const display = exp.concat(op)
+        this.props.updateExpression(display);
     }
+
     onDecimalClick(e) {
-        console.log("onDecimalClick");
         this.processDecimal();
-
     }
 
+    // Equal sign entered/clicked, process ops collected so far
     processCalc() {
-        var arr;
-        var display = this.state.currentOp + "=";
+        var ops;
+        var exp = this.state.expression;
+        var op = this.state.lastOp;
 
         // if last op was an operation, ignore it
-        // otherwise add it to allOps
-        if ("*-/+".indexOf(this.state.currentOp) !== -1) {
-            arr = [...this.state.allOps];
+        // otherwise add it to ops and expression
+        if ("*-/+".indexOf(this.state.lastOp) !== -1) {
+            ops = [...this.state.ops];
         } else {
-            arr = [...this.state.allOps, this.state.currentOp];
-            this.props.addToExpression(display);
+            ops = [...this.state.ops, this.state.lastOp];
+            exp = exp.concat(this.state.lastOp);
         }
 
-        var results = calculate(arr);
-        console.log(results);
+        var results = calculate(ops);
         if (results.message === "success") {
+            this.setState({
+                ops: [], lastOp: results.value, expression: "", resetDisplay: true
+            });
             this.props.updateCurrentOp(results.value);
-            this.setState({
-                allOps: [],
-                currentOp: results.value,
-                resetDisplay: true
-            });
+            const display = exp.concat("=").concat(results.value);
+            this.props.updateExpression(display);
         } else {
-            this.props.updateCurrentOp(results.message);
             this.setState({
-                allOps: [],
-                currentOp: 0,
+                ops: [],
+                lastOp: 0,
+                expression: "",
                 resetDisplay: true
             });
+            this.props.updateCurrentOp(results.message);
+            const display = exp.concat(op)
+            this.props.updateExpression(display);
         }
     }
 

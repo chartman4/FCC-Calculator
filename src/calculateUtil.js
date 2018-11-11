@@ -44,7 +44,7 @@ function performMulDiv(arr) {
                 // all good
             } else {
                 value = parseFloat(arr[index - 1]) / divisor;
-                arr.splice(index - 1, 3, value.toPrecision(6));
+                arr.splice(index - 1, 3, value.toString());
                 index -= 1;
             }
         }

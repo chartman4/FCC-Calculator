@@ -32,31 +32,12 @@ export default class Calculator extends Component {
             expression: "",
             currentOp: "0",
         };
-        this.reset = this.reset.bind(this);
-        this.addToExpression = this.addToExpression.bind(this);
         this.updateCurrentOp = this.updateCurrentOp.bind(this);
         this.updateExpression = this.updateExpression.bind(this);
 
     }
 
 
-    // clear all operands and operations, return to start state
-    reset() {
-        console.log("reset");
-        this.setState({
-            expression: "",
-            currentOp: "0"
-        });
-    }
-    addToExpression(exp) {
-        console.log("addToExpression  " + exp);
-        const newExp = this.state.expression.concat(exp);
-        console.log("addToExpression  " + newExp);
-
-        this.setState({
-            expression: newExp
-        });
-    }
     updateExpression(exp) {
         var str = exp.toString();
         console.log("updateExpression  " + str);
@@ -74,11 +55,9 @@ export default class Calculator extends Component {
     render() {
         return (
             <Container>
-                <ExpressionDisplay exp1={this.state.expression} exp2={this.state.currentOp} />
+                <ExpressionDisplay exp1={this.state.expression} />
                 <CurrentOpDisplay exp={this.state.currentOp} />
                 <Keypad
-                    reset={this.reset}
-                    addToExpression={this.addToExpression}
                     updateCurrentOp={this.updateCurrentOp}
                     updateExpression={this.updateExpression} />
             </Container>
