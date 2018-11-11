@@ -40,13 +40,11 @@ export default class Calculator extends Component {
 
     updateExpression(exp) {
         var str = exp.toString();
-        console.log("updateExpression  " + str);
         this.setState({
             expression: str
         });
     }
     updateCurrentOp(exp) {
-        console.log("updateCurrentOp " + exp);
         const newCurrentOp = exp;
         this.setState({
             currentOp: newCurrentOp
