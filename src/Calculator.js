@@ -40,6 +40,7 @@ export default class Calculator extends Component {
 
     updateExpression(exp) {
         var str = exp.toString();
+
         this.setState({
             expression: str
         });
@@ -53,7 +54,7 @@ export default class Calculator extends Component {
     render() {
         return (
             <Container>
-                <ExpressionDisplay exp1={this.state.expression} />
+                <ExpressionDisplay exp={this.state.expression} />
                 <CurrentOpDisplay exp={this.state.currentOp} />
                 <Keypad
                     updateCurrentOp={this.updateCurrentOp}
