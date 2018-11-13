@@ -30,6 +30,8 @@ function performMulDiv(arr) {
         // replace them in the numbers array  
         if (arr[index] === "*") {
             value = parseFloat(arr[index - 1]) * parseFloat(arr[index + 1]);
+            value = (value * 10000).toFixed(4) / 10000
+            console.log(value);
             arr.splice(index - 1, 3, value);
             index -= 1;
 
@@ -44,7 +46,8 @@ function performMulDiv(arr) {
                 // all good
             } else {
                 value = parseFloat(arr[index - 1]) / divisor;
-                arr.splice(index - 1, 3, value.toString());
+                value = (value * 10000).toFixed(4) / 10000
+                arr.splice(index - 1, 3, value);
                 index -= 1;
             }
         }
@@ -66,11 +69,13 @@ function performAddSub(arr) {
         // replace them in the numbers array  
         if (arr[index] === "+") {
             value = parseFloat(arr[index - 1]) + parseFloat(arr[index + 1]);
+            value = (value * 10000).toFixed(4) / 10000
             arr.splice(index - 1, 3, value);
             index--;
             // do the same if it is subtraction, only do subtraction
         } else if (arr[index] === "-") {
             value = parseFloat(arr[index - 1]) - parseFloat(arr[index + 1]);
+            value = (value * 10000).toFixed(4) / 10000
             arr.splice(index - 1, 3, value);
             index -= 1;
         }

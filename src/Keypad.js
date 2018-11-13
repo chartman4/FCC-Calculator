@@ -119,7 +119,11 @@ export default class Keypad extends Component {
             ops = [];
         }
         // currentOp is operator, add operator to saved ops, save number as currentOp
-        else if ("+-*/".indexOf(this.state.lastOp) !== -1) {
+        // else if ("+-*/".indexOf(this.state.lastOp) !== -1) {
+        else if ("+" === this.state.lastOp ||
+            "-" === this.state.lastOp ||
+            "*" === this.state.lastOp ||
+            "/" === this.state.lastOp) {
             // last op is operator, update displays and add operator to saved ops, save number as current operand
             op = num;
             exp = this.state.expression + this.state.lastOp;  // append operator to expression
@@ -147,11 +151,15 @@ export default class Keypad extends Component {
         var exp = this.state.expression;
         var ops = this.state.ops.slice();
         // operator cases:
-        //      previous op is an operator, replace currentOp with new op, no other changes
+        //      previous op is an operator, replace lastOp with new op, no other changes
         //      previous op is a decimal or number (not an operator), save it to ops state and
         //      current operator to expression
-        if ("+-*/".indexOf(this.state.lastOp) === -1) {
-            //  previous op is a decimal or number, save current op to allOps, and currentOp to exp
+        if ("+" !== this.state.lastOp &&
+            "-" !== this.state.lastOp &&
+            "*" !== this.state.lastOp &&
+            "/" !== this.state.lastOp) {
+
+            //  previous op is a decimal or number, save last op to ops and to exp
             ops.push(this.state.lastOp);
             exp = exp.concat(this.state.lastOp);
         }
@@ -169,18 +177,28 @@ export default class Keypad extends Component {
         this.processOperator(keyPressed);
     }
     processDecimal() {
+        console.log("processDecimal");
         var exp = this.state.expression;
+        console.log(exp);
+
         var ops = this.state.ops.slice();
-        var op;
+        console.log(ops);
+
+        var op = "";
         // decimal point cases:
         //        after an operator, 
         //        after a number with no decimal, 
         //        after a number that has a decimal already ,
 
         // decimal after operator, save current operator, save "0." as currentOp
-        if ("+-*/".indexOf(this.state.lastOp) !== -1) {
+        // if (this.state.lastOp.toString().includes("+-*/")) {
+        if ("+" === this.state.lastOp ||
+            "-" === this.state.lastOp ||
+            "*" === this.state.lastOp ||
+            "/" === this.state.lastOp) {
+
             ops.push(this.state.lastOp);
-            exp.concat(this.state.lastOp);
+            exp = exp.concat(this.state.lastOp);
             op = "0.";
         }
         /// a number with no decimal, append decimal to currentOp
@@ -210,7 +228,11 @@ export default class Keypad extends Component {
 
         // if last op was an operation, ignore it
         // otherwise add it to ops and expression
-        if ("*-/+".indexOf(this.state.lastOp) !== -1) {
+        // if ("*-/+".indexOf(this.state.lastOp) !== -1) {
+        if ("+" === this.state.lastOp ||
+            "-" === this.state.lastOp ||
+            "*" === this.state.lastOp ||
+            "/" === this.state.lastOp) {
             ops = [...this.state.ops];
         } else {
             ops = [...this.state.ops, this.state.lastOp];

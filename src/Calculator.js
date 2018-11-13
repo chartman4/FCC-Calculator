@@ -17,7 +17,7 @@ border-radius: 6px;
 height: 90vh;
 font-family: sans-serif;
 grid-template-rows: 60px 60px  1fr;
-grid-gap: 20px;
+grid-gap: 10px;
 @media (min-width: 700px) {
     width: 508px;
 
