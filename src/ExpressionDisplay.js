@@ -7,7 +7,7 @@ const Div = styled.div`
     border: 2px solid black;
     text-align: right;
     border-radius: 4px;
-
+    overflow:auto;
 `;
 
 const ExpressionDisplay = ({ exp }) => (
