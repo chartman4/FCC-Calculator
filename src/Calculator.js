@@ -14,7 +14,7 @@ width: 95vw;
 background-color: #7f8084;
 border: 6px solid gray;
 border-radius: 6px;
-height: 80vh;
+height: 90vh;
 font-family: sans-serif;
 grid-template-rows: 60px 60px  1fr;
 grid-gap: 20px;
